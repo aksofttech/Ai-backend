@@ -1,0 +1,88 @@
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
+import { UserRole } from '../../common/enums/role.enum';
+import { TenantStatus } from '../../common/enums/tenant-status.enum';
+import { JwtPayload } from '../../common/types/jwt-payload.interface';
+import { Tenant } from '../../database/entities/tenant.entity';
+import { User } from '../../database/entities/user.entity';
+import { UsersService } from '../users/users.service';
+import { LoginDto } from './dto/login.dto';
+import { SignupDto } from './dto/signup.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
+@Injectable()
+export class AuthService {
+  private readonly saltRounds = 12;
+
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
+    @InjectRepository(Tenant)
+    private readonly tenantRepository: Repository<Tenant>,
+  ) {}
+
+  async signup(dto: SignupDto) {
+    const existing = await this.usersService.findByEmailGlobal(dto.email);
+    if (existing) {
+      throw new ConflictException('Email already registered');
+    }
+
+    let tenantId = dto.tenantId;
+    if (!tenantId) {
+      const tenant = this.tenantRepository.create({
+        name: dto.tenantName ?? `${dto.email.split('@')[0]} School`,
+        status: TenantStatus.ACTIVE,
+      });
+      const saved = await this.tenantRepository.save(tenant);
+      tenantId = saved.id;
+    }
+
+    const passwordHash = await bcrypt.hash(dto.password, this.saltRounds);
+    const user = await this.usersService.create({
+      tenantId,
+      email: dto.email,
+      passwordHash,
+      role: dto.role ?? UserRole.ADMIN,
+    });
+
+    return this.buildAuthResponse(user);
+  }
+
+  async login(dto: LoginDto) {
+    const user = await this.usersService.findByEmailWithPassword(dto.email);
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    const valid = await bcrypt.compare(dto.password, user.passwordHash);
+    if (!valid) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    return this.buildAuthResponse(user);
+  }
+
+  private buildAuthResponse(user: User) {
+    const payload: JwtPayload = {
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+      tenantId: user.tenantId,
+    };
+    return {
+      accessToken: this.jwtService.sign(payload),
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        tenantId: user.tenantId,
+      },
+    };
+  }
+}

@@ -1,0 +1,20 @@
+import { IsInt, IsOptional, IsString, IsUUID, Max, Min } from 'class-validator';
+
+export class SemanticSearchDto {
+  @IsString()
+  query: string;
+
+  @IsOptional()
+  @IsUUID()
+  chapterId?: string;
+
+  @IsOptional()
+  @IsUUID()
+  bookId?: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(20)
+  topK?: number;
+}
