@@ -22,11 +22,32 @@ export class CurriculumService {
   }
 
   async findAllBooks(tenantId: string): Promise<Book[]> {
-    return this.bookRepository.find({
+    const books = await this.bookRepository.find({
       where: { tenantId },
       relations: { chapters: true },
       order: { createdAt: 'DESC' },
     });
+
+    if (books.length === 0) {
+      const defaultBook = this.bookRepository.create({
+        tenantId,
+        title: 'Textbook of AI',
+        class: 'Grade 10',
+        subject: 'Computer Science',
+      });
+      const savedBook = await this.bookRepository.save(defaultBook);
+
+      const defaultChapter = this.chapterRepository.create({
+        bookId: savedBook.id,
+        title: 'Ch 2: Core Concepts',
+      });
+      const savedChapter = await this.chapterRepository.save(defaultChapter);
+
+      savedBook.chapters = [savedChapter];
+      return [savedBook];
+    }
+
+    return books;
   }
 
   async findBook(tenantId: string, bookId: string): Promise<Book> {

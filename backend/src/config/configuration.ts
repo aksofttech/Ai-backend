@@ -12,15 +12,21 @@ export default () => ({
     expiresIn: process.env.JWT_EXPIRES_IN ?? '7d',
   },
   openai: {
-    apiKey: process.env.OPENAI_API_KEY ?? '',
+    apiKey: process.env.GEMINI_API_KEY ?? process.env.OPENAI_API_KEY ?? '',
+    baseURL: process.env.OPENAI_BASE_URL ?? undefined,
     embeddingModel:
-      process.env.OPENAI_EMBEDDING_MODEL ?? 'text-embedding-3-small',
-    chatModel: process.env.OPENAI_CHAT_MODEL ?? 'gpt-4o-mini',
+      process.env.GEMINI_EMBEDDING_MODEL ??
+      process.env.OPENAI_EMBEDDING_MODEL ??
+      'gemini-embedding-2',
+    chatModel:
+      process.env.GEMINI_CHAT_MODEL ??
+      process.env.OPENAI_CHAT_MODEL ??
+      'gemini-2.5-flash',
   },
   rag: {
     chunkSize: parseInt(process.env.RAG_CHUNK_SIZE ?? '800', 10),
     chunkOverlap: parseInt(process.env.RAG_CHUNK_OVERLAP ?? '100', 10),
     topK: parseInt(process.env.RAG_TOP_K ?? '5', 10),
-    embeddingDimensions: 1536,
+    embeddingDimensions: parseInt(process.env.RAG_EMBEDDING_DIMENSIONS ?? '1536', 10),
   },
 });

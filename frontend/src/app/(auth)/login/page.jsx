@@ -23,21 +23,40 @@ export default function LoginPage() {
     setError('');
 
     try {
-      // Replace with your actual login endpoint
-      // const response = await api.post('/auth/login', { email, password });
-      
-      // MOCK LOGIN FOR NOW
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      if (email === 'demo@yugsoft.com' && password === 'demo123') {
-        const mockUser = { id: 1, name: 'Demo Teacher', email };
-        const mockToken = 'mock-jwt-token-12345';
-        setAuth(mockUser, mockToken);
-        router.push('/teacher'); // Redirect to dashboard
-      } else {
-        throw new Error('Invalid email or password. Use demo@yugsoft.com / demo123');
+      let response;
+      try {
+        response = await api.post('/auth/login', { email, password });
+      } catch (err) {
+        // If credentials match the demo credentials and user doesn't exist (401), auto-signup
+        if (email === 'demo@yugsoft.com' && password === 'demo1234' && (err.response?.status === 401 || err.response?.status === 404)) {
+          response = await api.post('/auth/signup', {
+            email,
+            password,
+            tenantName: 'Demo School',
+            role: 'teacher'
+          });
+        } else {
+          throw err;
+        }
       }
+
+      const data = response.data?.data || response.data;
+      const { accessToken, user } = data;
+      setAuth(user, accessToken);
+      router.push('/teacher'); // Redirect to dashboard
     } catch (err) {
-      setError(err.message || 'An error occurred during login.');
+      const apiError = err.response?.data?.message;
+      let errorMsg = '';
+      if (typeof apiError === 'string') {
+        errorMsg = apiError;
+      } else if (Array.isArray(apiError)) {
+        errorMsg = apiError.join(', ');
+      } else if (apiError && typeof apiError === 'object') {
+        errorMsg = apiError.message || JSON.stringify(apiError);
+      } else {
+        errorMsg = err.response?.data?.error || err.message || 'Invalid email or password. Hint: Use demo@yugsoft.com / demo1234';
+      }
+      setError(errorMsg);
     } finally {
       setIsLoading(false);
     }

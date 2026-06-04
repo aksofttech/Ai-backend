@@ -4,21 +4,45 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Brain, Mail, Lock, User, ArrowRight, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import api from '@/services/api';
 
 export default function SignupPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSignup = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    // Placeholder for actual signup logic
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setIsLoading(false);
-    alert('Signup successful! Redirecting to login...');
-    window.location.href = '/login';
+    setError('');
+
+    try {
+      await api.post('/auth/signup', {
+        email,
+        password,
+        tenantName: name ? `${name}'s School` : undefined,
+        role: 'teacher'
+      });
+      alert('Signup successful! Redirecting to login...');
+      window.location.href = '/login';
+    } catch (err) {
+      const apiError = err.response?.data?.message;
+      let errorMsg = '';
+      if (typeof apiError === 'string') {
+        errorMsg = apiError;
+      } else if (Array.isArray(apiError)) {
+        errorMsg = apiError.join(', ');
+      } else if (apiError && typeof apiError === 'object') {
+        errorMsg = apiError.message || JSON.stringify(apiError);
+      } else {
+        errorMsg = err.response?.data?.error || err.message || 'An error occurred during signup.';
+      }
+      setError(errorMsg);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -44,6 +68,12 @@ export default function SignupPage() {
           <h2 className="text-3xl font-bold tracking-tight">Create an Account</h2>
           <p className="text-gray-400 mt-2 text-sm text-center">Join YugSoft AI and supercharge your teaching.</p>
         </div>
+
+        {error && (
+          <div className="mb-6 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleSignup} className="space-y-5">
           <div>

@@ -12,6 +12,7 @@ import { UserRole } from '../../common/enums/role.enum';
 import { AuthenticatedUser } from '../../common/types/jwt-payload.interface';
 import { IngestPdfDto } from './dto/ingest-pdf.dto';
 import { SemanticSearchDto } from './dto/semantic-search.dto';
+import { RagChatDto } from './dto/rag-chat.dto';
 import { RagEngineService } from './rag-engine.service';
 
 @Controller('rag')
@@ -40,5 +41,14 @@ export class RagEngineController {
     @Body() dto: SemanticSearchDto,
   ) {
     return this.ragEngineService.semanticSearch(user.tenantId, dto);
+  }
+
+  @Roles(UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT)
+  @Post('chat')
+  chat(
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: RagChatDto,
+  ) {
+    return this.ragEngineService.chat(user.tenantId, dto);
   }
 }

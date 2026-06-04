@@ -7,6 +7,7 @@ import { BookChunk } from '../../../database/entities/book-chunk.entity';
 export interface VectorSearchResult {
   id: string;
   chapterId: string;
+  chapterTitle: string;
   contentText: string;
   similarity: number;
 }
@@ -36,6 +37,7 @@ export class VectorSearchService {
       .innerJoin('chapter.book', 'book')
       .select('chunk.id', 'id')
       .addSelect('chunk.chapter_id', 'chapterId')
+      .addSelect('chapter.title', 'chapterTitle')
       .addSelect('chunk.content_text', 'contentText')
       .addSelect(
         `1 - (chunk.embedding <=> '${vectorLiteral}'::vector)`,
