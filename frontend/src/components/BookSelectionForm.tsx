@@ -4,7 +4,13 @@ import React, { useState, useEffect } from "react";
 import { BookOpen, ChevronDown, Loader2 } from "lucide-react";
 import api from "@/services/api";
 
-export default function BookSelectionForm({ onGenerate }: { onGenerate?: (plan: any) => void }) {
+export default function BookSelectionForm({
+  onGenerate,
+  hidePeriods = false,
+}: {
+  onGenerate?: (plan: any) => void;
+  hidePeriods?: boolean;
+}) {
   const [books, setBooks] = useState<any[]>([]);
   const [chapters, setChapters] = useState<any[]>([]);
   
@@ -42,7 +48,18 @@ export default function BookSelectionForm({ onGenerate }: { onGenerate?: (plan: 
   }, [selectedBookId]);
 
   const handleGenerate = async () => {
-    if (!selectedBookId || !selectedChapterId || !periods) return;
+    if (!selectedBookId || !selectedChapterId) return;
+
+    // In hidePeriods (chat) mode — just pass the selection, no lesson-plan API call
+    if (hidePeriods) {
+      const chapterTitle = selectedChapterData?.title || selectedChapterData?.name || '';
+      const bookTitle = selectedBookData?.title || selectedBookData?.name || '';
+      if (onGenerate) onGenerate({ bookId: selectedBookId, chapterId: selectedChapterId, chapterTitle, bookTitle });
+      return;
+    }
+
+    if (!periods) return;
+
     setIsGenerating(true);
     try {
       const chapterTitle = selectedChapterData?.title || selectedChapterData?.name || '';
@@ -140,23 +157,25 @@ export default function BookSelectionForm({ onGenerate }: { onGenerate?: (plan: 
             </div>
           </div>
 
-          <div className="flex flex-col space-y-1.5">
-            <label htmlFor="periods" className="text-sm font-medium text-gray-200">Number of Periods</label>
-            <input
-              type="number"
-              id="periods"
-              min="1"
-              max="20"
-              value={periods}
-              onChange={(e) => setPeriods(e.target.value ? parseInt(e.target.value, 10) : "")}
-              className="w-full bg-zinc-900 border border-zinc-700 text-white rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-zinc-500 transition-colors placeholder:text-gray-600"
-              placeholder="e.g., 5"
-              disabled={isGenerating}
-            />
-            <p className="text-xs text-gray-500">
-              Specify the number of periods (1-20) to generate lesson plans for
-            </p>
-          </div>
+          {!hidePeriods && (
+            <div className="flex flex-col space-y-1.5">
+              <label htmlFor="periods" className="text-sm font-medium text-gray-200">Number of Periods</label>
+              <input
+                type="number"
+                id="periods"
+                min="1"
+                max="20"
+                value={periods}
+                onChange={(e) => setPeriods(e.target.value ? parseInt(e.target.value, 10) : "")}
+                className="w-full bg-zinc-900 border border-zinc-700 text-white rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-zinc-500 transition-colors placeholder:text-gray-600"
+                placeholder="e.g., 5"
+                disabled={isGenerating}
+              />
+              <p className="text-xs text-gray-500">
+                Specify the number of periods (1-20) to generate lesson plans for
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Info Summary Box */}
@@ -182,16 +201,16 @@ export default function BookSelectionForm({ onGenerate }: { onGenerate?: (plan: 
         <button
           type="button"
           onClick={handleGenerate}
-          disabled={mounted && (!selectedBookId || !selectedChapterId || !periods || isGenerating)}
+          disabled={mounted && (!selectedBookId || !selectedChapterId || (!hidePeriods && !periods) || isGenerating)}
           className="w-full flex items-center justify-center bg-white text-black font-semibold py-2.5 px-4 rounded-md hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[#0a0a0a] shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isGenerating ? (
             <>
               <Loader2 className="w-5 h-5 animate-spin mr-2" />
-              Generating AI Plan... please wait
+              {hidePeriods ? 'Loading...' : 'Generating AI Plan... please wait'}
             </>
           ) : (
-            "Generate Lesson Plan"
+            hidePeriods ? 'Start Chat' : 'Generate Lesson Plan'
           )}
         </button>
 

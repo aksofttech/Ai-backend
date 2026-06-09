@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
+import useCurriculumStore from '@/store/curriculumStore';
 import Sidebar from '@/components/layout/Sidebar';
 import TopHeader from '@/components/layout/TopHeader';
 import SplitWorkspace from '@/components/layout/SplitWorkspace';
@@ -15,15 +17,20 @@ import AIPPTGen from '@/components/features/AIPPTGen';
 import TestPaperGen from '@/components/features/TestPaperGen';
 import AIHomeworkGen from '@/components/features/AIHomeworkGen';
 
-export default function Dashboard() {
-  const [activeTool, setActiveTool] = useState('chat');
+function TeacherDashboard() {
+  const searchParams = useSearchParams();
+  const initialTool = searchParams.get('tool') || 'chat';
+  const [activeTool, setActiveTool] = useState(initialTool);
+  // Show textbook reader only after Chat with Book form is submitted
+  const { selectedChapterId } = useCurriculumStore();
+  const showReader = activeTool === 'chat' && !!selectedChapterId;
 
   return (
     <div className="h-full flex overflow-hidden">
       <Sidebar activeTool={activeTool} setActiveTool={setActiveTool} />
       <div className="flex-1 flex flex-col h-full overflow-hidden relative">
         <TopHeader />
-        <SplitWorkspace showReader={activeTool === 'chat'}>
+        <SplitWorkspace showReader={showReader}>
           <div className={`h-full w-full ${activeTool === 'chat' ? 'block' : 'hidden'}`}>
             <ChatWithBook />
           </div>
@@ -51,5 +58,13 @@ export default function Dashboard() {
         </SplitWorkspace>
       </div>
     </div>
+  );
+}
+
+export default function Dashboard() {
+  return (
+    <Suspense fallback={null}>
+      <TeacherDashboard />
+    </Suspense>
   );
 }

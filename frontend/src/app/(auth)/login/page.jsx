@@ -49,7 +49,7 @@ export default function LoginPage() {
       } else if (user?.role?.toLowerCase() === 'student') {
         router.push('/student');
       } else {
-        router.push('/teacher');
+        router.push('/dashboard');
       }
     } catch (err) {
       const apiError = err.response?.data?.message;
