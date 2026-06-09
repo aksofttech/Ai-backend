@@ -128,23 +128,8 @@ export class RagEngineService {
         where: { chapterId: dto.chapterId },
       });
       if (count === 0) {
-        // Auto-seed default chunks
-        const segments = this.chunking.semanticChunk([{ pageNumber: 1, text: DEFAULT_TEXT }]);
-        let embeddings: number[][] = [];
-        try {
-          embeddings = await this.embedding.embedTexts(segments.map(s => s.contentText));
-        } catch (e) {
-          console.warn('Seeding: Embedding failed, using null embeddings', e);
-        }
-        const entities = segments.map((segment, index) =>
-          this.chunkRepository.create({
-            chapterId: dto.chapterId,
-            contentText: segment.contentText,
-            pageNumber: segment.pageNumber,
-            embedding: embeddings[index] ?? null,
-          }),
-        );
-        await this.chunkRepository.save(entities);
+        console.warn(`[RAG] Chapter ${dto.chapterId} has no ingested content. Returning empty context.`);
+        return [];
       }
     }
 

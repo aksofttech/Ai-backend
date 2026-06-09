@@ -23,7 +23,7 @@ export default function Dashboard() {
       <Sidebar activeTool={activeTool} setActiveTool={setActiveTool} />
       <div className="flex-1 flex flex-col h-full overflow-hidden relative">
         <TopHeader />
-        <SplitWorkspace>
+        <SplitWorkspace showReader={activeTool === 'chat'}>
           <div className={`h-full w-full ${activeTool === 'chat' ? 'block' : 'hidden'}`}>
             <ChatWithBook />
           </div>
