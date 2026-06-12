@@ -2,12 +2,13 @@ import React from 'react';
 import Link from 'next/link';
 import { 
   MessageSquare, BookOpen, FileText, LayoutDashboard, 
-  CheckCircle, Presentation, FilePenLine, User, LogOut, X
+  CheckCircle, Presentation, FilePenLine, User, LogOut, X, Gamepad2
 } from 'lucide-react';
 import useAuthStore from '@/store/authStore';
 
 const TOOLS = [
   { id: 'chat', label: 'Chat with Book', icon: MessageSquare },
+  { id: 'gamified-quiz', label: 'Quiz Generator', icon: Gamepad2 },
   { id: 'lesson', label: 'AI Lesson Plan', icon: BookOpen },
   { id: 'worksheet', label: 'Worksheet Gen', icon: FileText },
   { id: 'custom-worksheet', label: 'Custom Worksheet', icon: LayoutDashboard },

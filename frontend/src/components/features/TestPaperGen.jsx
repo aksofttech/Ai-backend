@@ -363,7 +363,7 @@ export default function TestPaperGen() {
                              {isTrueFalse ? (
                                <div className="flex justify-between">
                                  <p className="text-gray-200"><span className="font-bold mr-2">{currentQNum}.</span> {q.question || q.statement}</p>
-                                 <div className="text-gray-400 font-mono font-bold flex-shrink-0 ml-6 tracking-widest">[ T / F ]</div>
+                                 <div className="text-gray-400 font-mono font-bold shrink-0 ml-6 tracking-widest">[ T / F ]</div>
                                </div>
                              ) : (
                                <div>
@@ -403,7 +403,7 @@ export default function TestPaperGen() {
           
           <GlassCard className="p-8 border border-white/10 hover:border-neon-purple/30 transition-colors group">
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-neon-purple/20 to-blue-500/10 flex items-center justify-center border border-neon-purple/20 group-hover:shadow-[0_0_15px_rgba(139,92,246,0.3)] transition-all">
+              <div className="w-12 h-12 rounded-2xl bg-linear-to-br from-neon-purple/20 to-blue-500/10 flex items-center justify-center border border-neon-purple/20 group-hover:shadow-[0_0_15px_rgba(139,92,246,0.3)] transition-all">
                 <Info size={22} className="text-neon-purple"/>
               </div>
               <div>
@@ -484,7 +484,7 @@ export default function TestPaperGen() {
           <GlassCard className="p-8 border border-white/10 hover:border-emerald-green/30 transition-colors group flex flex-col justify-between">
             <div>
               <div className="flex items-center gap-4 mb-6">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-green/20 to-teal-500/10 flex items-center justify-center border border-emerald-green/20 group-hover:shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all">
+                <div className="w-12 h-12 rounded-2xl bg-linear-to-br from-emerald-green/20 to-teal-500/10 flex items-center justify-center border border-emerald-green/20 group-hover:shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all">
                   <BookOpen size={22} className="text-emerald-green"/>
                 </div>
                 <div>
@@ -562,7 +562,7 @@ export default function TestPaperGen() {
           </div>
 
           <div className="flex items-center gap-4 mb-8 relative z-10">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/10 flex items-center justify-center border border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.15)]">
+            <div className="w-12 h-12 rounded-2xl bg-linear-to-br from-blue-500/20 to-purple-500/10 flex items-center justify-center border border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.15)]">
               <HelpCircle size={22} className="text-blue-400"/>
             </div>
             <div>
@@ -583,7 +583,7 @@ export default function TestPaperGen() {
               {questionStructure.map((q) => (
                 <div key={q.id} className="grid grid-cols-12 gap-4 py-3 px-2 rounded-xl hover:bg-white/5 transition-colors items-center border border-transparent hover:border-white/5">
                   <div className="col-span-5 flex items-center gap-3">
-                    <div className="w-1.5 h-6 rounded-full bg-gradient-to-b from-neon-purple to-transparent opacity-70"></div>
+                    <div className="w-1.5 h-6 rounded-full bg-linear-to-b from-neon-purple to-transparent opacity-70"></div>
                     <span className="text-[15px] font-medium text-gray-200">{q.label}</span>
                   </div>
                   
@@ -621,9 +621,9 @@ export default function TestPaperGen() {
             </div>
 
             <div className="flex justify-end items-center mt-8 pt-6 border-t border-white/10">
-              <div className="bg-gradient-to-r from-neon-purple/10 to-blue-500/10 border border-neon-purple/20 px-8 py-4 rounded-2xl flex items-center gap-6 shadow-[0_0_30px_rgba(139,92,246,0.1)]">
+              <div className="bg-linear-to-r from-neon-purple/10 to-blue-500/10 border border-neon-purple/20 px-8 py-4 rounded-2xl flex items-center gap-6 shadow-[0_0_30px_rgba(139,92,246,0.1)]">
                 <span className="text-sm font-bold text-gray-300 uppercase tracking-widest">Maximum Marks</span>
-                <span className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-neon-purple to-blue-400">
+                <span className="text-3xl font-black text-transparent bg-clip-text bg-linear-to-r from-neon-purple to-blue-400">
                   {totalMaximumMarks}
                 </span>
               </div>
@@ -640,7 +640,7 @@ export default function TestPaperGen() {
               className={`
                 w-full py-4 rounded-xl font-bold text-[16px] flex items-center justify-center gap-3 transition-all duration-300 mb-3
                 ${isFormValid 
-                  ? 'bg-gradient-to-r from-neon-purple to-blue-600 text-white shadow-[0_0_20px_rgba(139,92,246,0.4)] hover:shadow-[0_0_30px_rgba(139,92,246,0.6)] hover:scale-[1.02]' 
+                  ? 'bg-linear-to-r from-neon-purple to-blue-600 text-white shadow-[0_0_20px_rgba(139,92,246,0.4)] hover:shadow-[0_0_30px_rgba(139,92,246,0.6)] hover:scale-[1.02]' 
                   : 'bg-white/5 text-gray-500 border border-white/10 cursor-not-allowed'
                 }
               `}

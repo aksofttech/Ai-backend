@@ -13,6 +13,7 @@ import {
   Sparkles,
   ArrowRight,
   Brain,
+  Gamepad2,
 } from 'lucide-react';
 
 /* ─── Tool card definitions ─────────────────────────────────────── */
@@ -29,6 +30,19 @@ const TOOLS = [
     glow: 'shadow-violet-500/20',
     border: 'hover:border-violet-500/40',
     dot: 'bg-violet-400',
+  },
+  {
+    id: 'gamified-quiz',
+    href: '/teacher?tool=gamified-quiz',
+    label: 'Quiz Generator',
+    description: 'Instantly generate an interactive, gamified quiz for your students.',
+    icon: Gamepad2,
+    gradient: 'from-indigo-600/20 to-blue-900/20',
+    iconBg: 'bg-indigo-600/20',
+    iconColor: 'text-indigo-400',
+    glow: 'shadow-indigo-500/20',
+    border: 'hover:border-indigo-500/40',
+    dot: 'bg-indigo-400',
   },
   {
     id: 'lesson',

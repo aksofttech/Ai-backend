@@ -7,7 +7,7 @@ import Link from 'next/link';
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#050505] text-white flex flex-col font-sans selection:bg-neon-purple selection:text-white">
+    <div className="min-h-screen bg-obsidian text-white flex flex-col font-sans selection:bg-neon-purple selection:text-white">
       {/* Background glowing effects */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
         <div className="absolute -top-40 -right-40 w-96 h-96 bg-neon-purple/20 rounded-full blur-[100px]" />
@@ -18,7 +18,7 @@ export default function LandingPage() {
       <header className="relative z-10 w-full px-4 md:px-8 py-4 md:py-6 flex justify-between items-center glass-panel border-b border-glass-border">
         <div className="flex items-center gap-2">
           <Brain className="w-8 h-8 text-neon-purple" />
-          <span className="text-xl md:text-2xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-neon-purple to-emerald-green">
+          <span className="text-xl md:text-2xl font-bold tracking-tight bg-clip-text text-transparent bg-linear-to-r from-neon-purple to-emerald-green">
             YugSoft AI
           </span>
         </div>
@@ -55,7 +55,7 @@ export default function LandingPage() {
           
           <h1 className="text-4xl md:text-6xl lg:text-8xl font-extrabold tracking-tight mb-6 md:mb-8 mt-10 md:mt-0">
             Empower Your <br />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-neon-purple to-emerald-green">
+            <span className="bg-clip-text text-transparent bg-linear-to-r from-neon-purple to-emerald-green">
               Teaching Experience
             </span>
           </h1>

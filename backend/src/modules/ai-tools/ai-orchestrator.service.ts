@@ -7,6 +7,7 @@ import { PptService } from './services/ppt.service';
 import { WorksheetService } from './services/worksheet.service';
 import { CustomWorksheetService } from './services/custom-worksheet.service';
 import { TestPaperService } from './services/test-paper.service';
+import { GamifiedQuizService } from './services/gamified-quiz.service';
 
 import { AiToolType } from './ai-tool-type';
 
@@ -20,6 +21,7 @@ export class AiOrchestratorService {
     private readonly ppt: PptService,
     private readonly homework: HomeworkService,
     private readonly testPaper: TestPaperService,
+    private readonly gamifiedQuiz: GamifiedQuizService,
   ) {}
 
   async generate(
@@ -57,6 +59,9 @@ export class AiOrchestratorService {
         break;
       case 'test-paper':
         content = await this.testPaper.generate(dto, context);
+        break;
+      case 'gamified-quiz':
+        content = await this.gamifiedQuiz.generate(dto, context);
         break;
       default:
         content = '';

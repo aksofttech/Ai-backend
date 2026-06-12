@@ -357,7 +357,7 @@ export default function AdminPanel({ activeTab: propActiveTab, setActiveTab: pro
       {/* Top Breadcrumb / Title */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-neon-purple to-emerald-green">
+          <h1 className="text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-linear-to-r from-neon-purple to-emerald-green">
             Tech Administration Canvas
           </h1>
           <p className="text-gray-400 text-sm mt-1">Manage educational curriculum, PDF ingestions, and user permissions.</p>

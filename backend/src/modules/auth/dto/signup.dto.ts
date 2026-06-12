@@ -6,7 +6,6 @@ import {
   IsUUID,
   MinLength,
 } from 'class-validator';
-import { UserRole } from '../../../common/enums/role.enum';
 
 export class SignupDto {
   @IsEmail()
@@ -24,8 +23,4 @@ export class SignupDto {
   @IsString()
   @MinLength(2)
   tenantName?: string;
-
-  @IsOptional()
-  @IsEnum(UserRole)
-  role?: UserRole;
 }

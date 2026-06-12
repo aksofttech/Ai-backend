@@ -9,6 +9,7 @@ import { PptService } from './services/ppt.service';
 import { WorksheetService } from './services/worksheet.service';
 import { CustomWorksheetService } from './services/custom-worksheet.service';
 import { TestPaperService } from './services/test-paper.service';
+import { GamifiedQuizService } from './services/gamified-quiz.service';
 
 @Module({
   imports: [RagEngineModule],
@@ -22,6 +23,7 @@ import { TestPaperService } from './services/test-paper.service';
     PptService,
     HomeworkService,
     TestPaperService,
+    GamifiedQuizService,
   ],
   exports: [AiOrchestratorService],
 })

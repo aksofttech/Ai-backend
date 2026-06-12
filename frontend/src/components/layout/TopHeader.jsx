@@ -3,7 +3,7 @@ import { Sparkles, Menu } from 'lucide-react';
 
 export default function TopHeader({ toggleSidebar }) {
   return (
-    <header data-id="top-header" className="h-[70px] flex-shrink-0 w-full flex items-center justify-between md:justify-end px-4 md:px-6 z-20 border-b border-glass-border md:border-none">
+    <header data-id="top-header" className="h-[70px] shrink-0 w-full flex items-center justify-between md:justify-end px-4 md:px-6 z-20 border-b border-glass-border md:border-none">
       {/* Mobile Menu Button */}
       {toggleSidebar && (
         <button onClick={toggleSidebar} className="md:hidden p-2 -ml-2 text-gray-300 hover:text-white transition-colors">
