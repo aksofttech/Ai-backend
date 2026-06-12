@@ -258,7 +258,9 @@ export class RagEngineService {
   }
 
   async semanticSearch(tenantId: string, dto: SemanticSearchDto) {
-    if (dto.chapterId) {
+    if (dto.chapterIds && dto.chapterIds.length > 0) {
+      // bypass count check for multiple chapters to keep it simple, vector search handles empty results gracefully
+    } else if (dto.chapterId) {
       const count = await this.chunkRepository.count({
         where: { chapterId: dto.chapterId },
       });
@@ -274,6 +276,7 @@ export class RagEngineService {
       const queryEmbedding = await this.embedding.embedQuery(dto.query);
       return await this.vectorSearch.search(tenantId, queryEmbedding, {
         chapterId: dto.chapterId,
+        chapterIds: dto.chapterIds,
         bookId: dto.bookId,
         topK: dto.topK,
       });
@@ -295,7 +298,11 @@ export class RagEngineService {
         .addSelect('0.5', 'similarity')
         .where('book.tenantId = :tenantId', { tenantId });
 
-      if (dto.chapterId) {
+      if (dto.chapterIds && dto.chapterIds.length > 0) {
+        qb.andWhere('chunk.chapterId IN (:...chapterIds)', {
+          chapterIds: dto.chapterIds,
+        });
+      } else if (dto.chapterId) {
         qb.andWhere('chunk.chapterId = :chapterId', {
           chapterId: dto.chapterId,
         });
@@ -318,7 +325,20 @@ export class RagEngineService {
         .limit(dto.topK ?? 5)
         .getRawMany<VectorSearchResult>();
 
-      if (rows.length === 0 && dto.chapterId) {
+      if (rows.length === 0 && dto.chapterIds && dto.chapterIds.length > 0) {
+        return this.chunkRepository
+          .createQueryBuilder('chunk')
+          .innerJoin('chunk.chapter', 'chapter')
+          .select('chunk.id', 'id')
+          .addSelect('chunk.chapterId', 'chapterId')
+          .addSelect('chapter.title', 'chapterTitle')
+          .addSelect('chunk.contentText', 'contentText')
+          .addSelect('chunk.pageNumber', 'pageNumber')
+          .addSelect('0.1', 'similarity')
+          .where('chunk.chapterId IN (:...chapterIds)', { chapterIds: dto.chapterIds })
+          .limit(dto.topK ?? 5)
+          .getRawMany<VectorSearchResult>();
+      } else if (rows.length === 0 && dto.chapterId) {
         return this.chunkRepository
           .createQueryBuilder('chunk')
           .innerJoin('chunk.chapter', 'chapter')

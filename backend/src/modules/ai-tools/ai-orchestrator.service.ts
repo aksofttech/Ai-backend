@@ -5,6 +5,8 @@ import { HomeworkService } from './services/homework.service';
 import { LessonPlanService } from './services/lesson-plan.service';
 import { PptService } from './services/ppt.service';
 import { WorksheetService } from './services/worksheet.service';
+import { CustomWorksheetService } from './services/custom-worksheet.service';
+import { TestPaperService } from './services/test-paper.service';
 
 import { AiToolType } from './ai-tool-type';
 
@@ -13,9 +15,11 @@ export class AiOrchestratorService {
   constructor(
     private readonly ragEngine: RagEngineService,
     private readonly worksheet: WorksheetService,
+    private readonly customWorksheet: CustomWorksheetService,
     private readonly lessonPlan: LessonPlanService,
     private readonly ppt: PptService,
     private readonly homework: HomeworkService,
+    private readonly testPaper: TestPaperService,
   ) {}
 
   async generate(
@@ -26,8 +30,9 @@ export class AiOrchestratorService {
     const ragResults = await this.ragEngine.semanticSearch(tenantId, {
       query: dto.prompt,
       chapterId: dto.chapterId,
+      chapterIds: dto.chapterIds,
       bookId: dto.bookId,
-      topK: 5,
+      topK: 10, // Increase topK slightly to get more context if multiple chapters
     });
     const context = ragResults
       .map((r, i) => `[${i + 1}] (sim=${r.similarity ? Number(r.similarity).toFixed(2) : '0.00'})\n${r.contentText}`)
@@ -38,6 +43,9 @@ export class AiOrchestratorService {
       case 'worksheet':
         content = await this.worksheet.generate(dto, context);
         break;
+      case 'custom-worksheet':
+        content = await this.customWorksheet.generate(dto, context);
+        break;
       case 'lesson-plan':
         content = await this.lessonPlan.generate(dto, context);
         break;
@@ -46,6 +54,9 @@ export class AiOrchestratorService {
         break;
       case 'homework':
         content = await this.homework.generate(dto, context);
+        break;
+      case 'test-paper':
+        content = await this.testPaper.generate(dto, context);
         break;
       default:
         content = '';

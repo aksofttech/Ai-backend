@@ -7,7 +7,7 @@ import { Send, Sparkles, BookOpen, Loader2, RefreshCw } from 'lucide-react';
 import useCurriculumStore from '@/store/curriculumStore';
 import api from '@/services/api';
 
-export default function ChatWithBook() {
+export default function ChatWithBook({ onReady }) {
   // null = show selection form; object = chat is active
   const [selection, setSelection] = useState(null);
   const { setSelectedSubjectId, setSelectedChapterId } = useCurriculumStore();
@@ -97,6 +97,7 @@ export default function ChatWithBook() {
           // Sync into curriculum store → Textbook Reader loads automatically
           setSelectedSubjectId(data.bookId);
           setSelectedChapterId(data.chapterId);
+          if (onReady) onReady(true);
         }}
       />
     );
@@ -125,6 +126,7 @@ export default function ChatWithBook() {
               setSelection(null);
               setSelectedSubjectId('');
               setSelectedChapterId('');
+              if (onReady) onReady(false);
             }}
             title="Change book / chapter"
             className="text-gray-400 hover:text-white transition-colors"

@@ -21,18 +21,24 @@ function TeacherDashboard() {
   const searchParams = useSearchParams();
   const initialTool = searchParams.get('tool') || 'chat';
   const [activeTool, setActiveTool] = useState(initialTool);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [chatReady, setChatReady] = useState(false);
   // Show textbook reader only after Chat with Book form is submitted
-  const { selectedChapterId } = useCurriculumStore();
-  const showReader = activeTool === 'chat' && !!selectedChapterId;
+  const showReader = activeTool === 'chat' && chatReady;
 
   return (
     <div className="h-full flex overflow-hidden">
-      <Sidebar activeTool={activeTool} setActiveTool={setActiveTool} />
+      <Sidebar 
+        activeTool={activeTool} 
+        setActiveTool={setActiveTool} 
+        isMobileOpen={isSidebarOpen}
+        setIsMobileOpen={setIsSidebarOpen}
+      />
       <div className="flex-1 flex flex-col h-full overflow-hidden relative">
-        <TopHeader />
+        <TopHeader toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
         <SplitWorkspace showReader={showReader}>
           <div className={`h-full w-full ${activeTool === 'chat' ? 'block' : 'hidden'}`}>
-            <ChatWithBook />
+            <ChatWithBook onReady={setChatReady} />
           </div>
           <div className={`h-full w-full ${activeTool === 'lesson' ? 'block' : 'hidden'}`}>
             <AILessonPlan />

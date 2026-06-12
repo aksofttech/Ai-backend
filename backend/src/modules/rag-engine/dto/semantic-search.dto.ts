@@ -9,6 +9,11 @@ export class SemanticSearchDto {
   chapterId?: string;
 
   @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  chapterIds?: string[];
+
+  @IsOptional()
   @IsUUID()
   bookId?: string;
 

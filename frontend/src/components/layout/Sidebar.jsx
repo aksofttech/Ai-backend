@@ -2,11 +2,9 @@ import React from 'react';
 import Link from 'next/link';
 import { 
   MessageSquare, BookOpen, FileText, LayoutDashboard, 
-  CheckCircle, Presentation, FilePenLine, User, Settings, LogOut
+  CheckCircle, Presentation, FilePenLine, User, LogOut, X
 } from 'lucide-react';
 import useAuthStore from '@/store/authStore';
-
-import Link from 'next/link';
 
 const TOOLS = [
   { id: 'chat', label: 'Chat with Book', icon: MessageSquare },
@@ -19,7 +17,7 @@ const TOOLS = [
   { id: 'homework', label: 'AI Homework Gen', icon: BookOpen },
 ];
 
-export default function Sidebar({ activeTool, setActiveTool }) {
+export default function Sidebar({ activeTool, setActiveTool, isMobileOpen, setIsMobileOpen }) {
   const { user, logout } = useAuthStore();
   const userRole = user?.role || 'teacher';
   const userEmail = user?.email || 'admin@yugsoft.com';
@@ -32,32 +30,52 @@ export default function Sidebar({ activeTool, setActiveTool }) {
   };
 
   return (
-    <div className="w-[250px] h-full flex flex-col glass-panel border-l-0 border-y-0 rounded-none z-10">
-      <Link href="/dashboard" className="p-6 block hover:opacity-80 transition-opacity">
-        <h1 className="text-2xl font-bold tracking-tighter text-white flex items-center gap-2">
-          <span className="text-neon-purple text-shadow-glow-purple">Yugsoft</span> Tech
-        </h1>
-      </Link>
+    <>
+      {/* Mobile Overlay */}
+      {isMobileOpen && (
+        <div 
+          className="md:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity"
+          onClick={() => setIsMobileOpen?.(false)}
+        />
+      )}
+      
+      <div className={`fixed md:static inset-y-0 left-0 transform ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300 ease-in-out w-[250px] md:w-[250px] h-full flex flex-col glass-panel border-l-0 border-y-0 md:rounded-none z-50`}>
+        <div className="flex items-center justify-between p-6">
+          <Link href="/dashboard" className="block hover:opacity-80 transition-opacity">
+            <h1 className="text-2xl font-bold tracking-tighter text-white flex items-center gap-2">
+              <span className="text-neon-purple text-shadow-glow-purple">Yugsoft</span> Tech
+            </h1>
+          </Link>
+          <button 
+            className="md:hidden text-gray-400 hover:text-white"
+            onClick={() => setIsMobileOpen?.(false)}
+          >
+            <X size={20} />
+          </button>
+        </div>
 
-      {/* Nav Links */}
+        {/* Nav Links */}
       <div className="flex-1 overflow-y-auto custom-scrollbar px-3 py-4 space-y-2">
         {TOOLS.map((tool) => {
           const isActive = activeTool === tool.id;
           const Icon = tool.icon;
           return (
-            <button
-              key={tool.id}
-              onClick={() => setActiveTool(tool.id)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-r-lg transition-all duration-200 text-sm font-medium
-                ${isActive 
-                  ? 'bg-neon-purple-dim text-white border-l-4 border-neon-purple box-shadow-glow-purple' 
-                  : 'text-gray-400 hover:bg-white/5 hover:text-gray-200 border-l-4 border-transparent'
-                }
-              `}
-            >
-              <Icon size={18} className={isActive ? "text-neon-purple" : ""} />
-              {tool.label}
-            </button>
+              <button
+                key={tool.id}
+                onClick={() => {
+                  setActiveTool(tool.id);
+                  if (setIsMobileOpen) setIsMobileOpen(false);
+                }}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-r-lg transition-all duration-200 text-sm font-medium
+                  ${isActive 
+                    ? 'bg-neon-purple-dim text-white border-l-4 border-neon-purple box-shadow-glow-purple' 
+                    : 'text-gray-400 hover:bg-white/5 hover:text-gray-200 border-l-4 border-transparent'
+                  }
+                `}
+              >
+                <Icon size={18} className={isActive ? "text-neon-purple" : ""} />
+                {tool.label}
+              </button>
           );
         })}
       </div>
@@ -81,7 +99,8 @@ export default function Sidebar({ activeTool, setActiveTool }) {
           <LogOut size={16} />
           Log Out
         </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

@@ -1,4 +1,4 @@
-import { IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
+import { IsOptional, IsString, IsUUID, MaxLength, IsArray } from 'class-validator';
 
 export class GenerateContentDto {
   @IsString()
@@ -14,6 +14,11 @@ export class GenerateContentDto {
   chapterId?: string;
 
   @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  chapterIds?: string[];
+
+  @IsOptional()
   @IsString()
   @MaxLength(100)
   grade?: string;
@@ -27,4 +32,12 @@ export class GenerateContentDto {
   @IsString()
   @MaxLength(100)
   subject?: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  customQuestions?: string[];
+
+  @IsOptional()
+  testPaperConfig?: any;
 }
