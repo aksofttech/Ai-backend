@@ -6,8 +6,12 @@ import {
   IsUUID,
   MinLength,
 } from 'class-validator';
+import { UserRole } from '../../../common/enums/role.enum';
 
 export class SignupDto {
+  @IsOptional()
+  @IsEnum(UserRole)
+  role?: UserRole;
   @IsEmail()
   email: string;
 

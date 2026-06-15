@@ -11,13 +11,17 @@ export default function BookSelectionForm({
   onGenerate?: (plan: any) => void;
   hidePeriods?: boolean;
 }) {
-  const [books, setBooks] = useState<any[]>([]);
+  const [classes, setClasses] = useState<string[]>([]);
+  const [subjects, setSubjects] = useState<any[]>([]);
   const [chapters, setChapters] = useState<any[]>([]);
   
-  const [selectedBookId, setSelectedBookId] = useState("");
+  const [selectedClassId, setSelectedClassId] = useState("");
+  const [selectedSubjectId, setSelectedSubjectId] = useState(""); // This is actually bookId
   const [selectedChapterId, setSelectedChapterId] = useState("");
   const [periods, setPeriods] = useState<number | "">(1);
   
+  const [isClassLoading, setIsClassLoading] = useState(false);
+  const [isSubjectLoading, setIsSubjectLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   // Prevents SSR/client hydration mismatch on disabled props
@@ -28,33 +32,49 @@ export default function BookSelectionForm({
   }, []);
 
   useEffect(() => {
-    api.get("/curriculum/books").then((res) => {
+    setIsClassLoading(true);
+    api.get("/curriculum/classes").then((res) => {
       const data = res.data?.data || res.data || [];
-      setBooks(data);
-    }).catch(console.error);
+      setClasses(Array.isArray(data) ? data : []);
+    }).catch(console.error).finally(() => setIsClassLoading(false));
   }, []);
 
   useEffect(() => {
-    if (!selectedBookId) {
+    if (!selectedClassId) {
+      setSubjects([]);
+      setSelectedSubjectId("");
+      return;
+    }
+    setIsSubjectLoading(true);
+    api.get(`/curriculum/subjects?classId=${encodeURIComponent(selectedClassId)}`).then((res) => {
+      const data = res.data?.data || res.data || [];
+      setSubjects(Array.isArray(data) ? data : []);
+      setSelectedSubjectId("");
+    }).catch(console.error).finally(() => setIsSubjectLoading(false));
+  }, [selectedClassId]);
+
+  useEffect(() => {
+    if (!selectedSubjectId) {
       setChapters([]);
       setSelectedChapterId("");
       return;
     }
     setIsLoading(true);
-    api.get(`/curriculum/books/${selectedBookId}/chapters`).then((res) => {
+    api.get(`/curriculum/chapters?subjectId=${encodeURIComponent(selectedSubjectId)}`).then((res) => {
       const data = res.data?.data || res.data || [];
-      setChapters(data);
+      setChapters(Array.isArray(data) ? data : []);
+      setSelectedChapterId("");
     }).catch(console.error).finally(() => setIsLoading(false));
-  }, [selectedBookId]);
+  }, [selectedSubjectId]);
 
   const handleGenerate = async () => {
-    if (!selectedBookId || !selectedChapterId) return;
+    if (!selectedSubjectId || !selectedChapterId) return;
 
     // In hidePeriods (chat) mode — just pass the selection, no lesson-plan API call
     if (hidePeriods) {
       const chapterTitle = selectedChapterData?.title || selectedChapterData?.name || '';
-      const bookTitle = selectedBookData?.title || selectedBookData?.name || '';
-      if (onGenerate) onGenerate({ bookId: selectedBookId, chapterId: selectedChapterId, chapterTitle, bookTitle });
+      const bookTitle = selectedSubjectData?.title || selectedSubjectData?.name || '';
+      if (onGenerate) onGenerate({ bookId: selectedSubjectId, chapterId: selectedChapterId, chapterTitle, bookTitle });
       return;
     }
 
@@ -63,9 +83,9 @@ export default function BookSelectionForm({
     setIsGenerating(true);
     try {
       const chapterTitle = selectedChapterData?.title || selectedChapterData?.name || '';
-      const bookTitle = selectedBookData?.title || selectedBookData?.name || '';
+      const bookTitle = selectedSubjectData?.title || selectedSubjectData?.name || '';
       const res = await api.post("/ai-tools/lesson-plan/generate", {
-        bookId: selectedBookId,
+        bookId: selectedSubjectId,
         chapterId: selectedChapterId,
         chapterTitle,
         subject: bookTitle,
@@ -89,7 +109,7 @@ export default function BookSelectionForm({
     }
   };
 
-  const selectedBookData = books.find(b => b.id === selectedBookId || b._id === selectedBookId);
+  const selectedSubjectData = subjects.find(s => s.id === selectedSubjectId || s._id === selectedSubjectId);
   const selectedChapterData = chapters.find(c => c.id === selectedChapterId || c._id === selectedChapterId);
 
   return (
@@ -111,21 +131,46 @@ export default function BookSelectionForm({
 
         {/* Form Fields */}
         <div className="space-y-5">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             <div className="flex flex-col space-y-1.5 relative">
-              <label htmlFor="book" className="text-sm font-medium text-gray-200">Select Book</label>
+              <label htmlFor="class" className="text-sm font-medium text-gray-200">
+                Select Class {isClassLoading && <Loader2 className="inline w-3 h-3 animate-spin ml-1" />}
+              </label>
               <div className="relative">
                 <select
-                  id="book"
-                  value={selectedBookId}
-                  onChange={(e) => setSelectedBookId(e.target.value)}
+                  id="class"
+                  value={selectedClassId}
+                  onChange={(e) => setSelectedClassId(e.target.value)}
                   className="w-full bg-zinc-900 border border-zinc-700 text-white rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-zinc-500 transition-colors appearance-none cursor-pointer"
-                  disabled={mounted && isGenerating}
+                  disabled={mounted && (isGenerating || isClassLoading)}
                 >
-                  <option value="" disabled>Select a book</option>
-                  {books.map(book => (
-                    <option key={book.id || book._id} value={book.id || book._id}>
-                      {book.title || book.name}
+                  <option value="" disabled>Select a class</option>
+                  {classes.map((cls, idx) => (
+                    <option key={idx} value={cls}>
+                      {cls}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+              </div>
+            </div>
+
+            <div className="flex flex-col space-y-1.5 relative">
+              <label htmlFor="subject" className="text-sm font-medium text-gray-200">
+                Select Subject {isSubjectLoading && <Loader2 className="inline w-3 h-3 animate-spin ml-1" />}
+              </label>
+              <div className="relative">
+                <select
+                  id="subject"
+                  value={selectedSubjectId}
+                  onChange={(e) => setSelectedSubjectId(e.target.value)}
+                  className="w-full bg-zinc-900 border border-zinc-700 text-white rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-zinc-500 transition-colors appearance-none cursor-pointer"
+                  disabled={mounted && (!selectedClassId || isGenerating || isSubjectLoading)}
+                >
+                  <option value="" disabled>Select a subject</option>
+                  {subjects.map(subject => (
+                    <option key={subject.id || subject._id} value={subject.id || subject._id}>
+                      {subject.title || subject.name}
                     </option>
                   ))}
                 </select>
@@ -143,7 +188,7 @@ export default function BookSelectionForm({
                   value={selectedChapterId}
                   onChange={(e) => setSelectedChapterId(e.target.value)}
                   className="w-full bg-zinc-900 border border-zinc-700 text-white rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-zinc-500 transition-colors appearance-none cursor-pointer"
-                  disabled={mounted && (!selectedBookId || isGenerating || isLoading)}
+                  disabled={mounted && (!selectedSubjectId || isGenerating || isLoading)}
                 >
                   <option value="" disabled>Select a chapter</option>
                   {chapters.map(chapter => (
@@ -187,7 +232,7 @@ export default function BookSelectionForm({
             <>
               <div className="text-base text-blue-950">
                 <span className="font-bold">{selectedChapterData.title || selectedChapterData.name}</span>{" "}
-                <span className="italic font-medium">from {selectedBookData?.title || selectedBookData?.name}</span>
+                <span className="italic font-medium">from {selectedSubjectData?.title || selectedSubjectData?.name}</span>
               </div>
             </>
           ) : (
@@ -201,7 +246,7 @@ export default function BookSelectionForm({
         <button
           type="button"
           onClick={handleGenerate}
-          disabled={mounted && (!selectedBookId || !selectedChapterId || (!hidePeriods && !periods) || isGenerating)}
+          disabled={mounted && (!selectedSubjectId || !selectedChapterId || (!hidePeriods && !periods) || isGenerating)}
           className="w-full flex items-center justify-center bg-white text-black font-semibold py-2.5 px-4 rounded-md hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[#0a0a0a] shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isGenerating ? (

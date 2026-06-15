@@ -179,25 +179,18 @@ export default function AdminPanel({ activeTab: propActiveTab, setActiveTab: pro
           const bookData = bookRes.data?.data || bookRes.data;
           const newBookId = bookData.id;
 
-          setBookCreationStep('chapter');
-          const chapterRes = await api.post(`/curriculum/books/${newBookId}/chapters`, {
-            title: 'Complete Textbook Content'
-          });
-          const chapterData = chapterRes.data?.data || chapterRes.data;
-          const newChapterId = chapterData.id;
-
           setBookCreationStep('ingest');
           const formData = new FormData();
           formData.append('file', bookFile);
-          formData.append('chapterId', newChapterId);
+          formData.append('bookId', newBookId);
 
-          await api.post('/rag/ingest', formData, {
+          await api.post('/rag/ingest-book', formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
             },
           });
 
-          showSuccess('Book created and PDF successfully ingested into RAG!');
+          showSuccess('Book created and PDF successfully ingested with AI Chapters!');
           setIsBookModalOpen(false);
           resetBookForm();
           fetchBooks();

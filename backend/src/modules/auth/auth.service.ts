@@ -48,7 +48,7 @@ export class AuthService {
       tenantId,
       email: dto.email,
       passwordHash,
-      role: UserRole.STUDENT,
+      role: dto.role || UserRole.STUDENT,
     });
 
     return this.buildAuthResponse(user);
