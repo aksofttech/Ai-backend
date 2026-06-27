@@ -10,6 +10,7 @@ import { WorksheetService } from './services/worksheet.service';
 import { CustomWorksheetService } from './services/custom-worksheet.service';
 import { TestPaperService } from './services/test-paper.service';
 import { GamifiedQuizService } from './services/gamified-quiz.service';
+import { AnswerKeyService } from './services/answer-key.service';
 
 @Module({
   imports: [RagEngineModule],
@@ -24,6 +25,7 @@ import { GamifiedQuizService } from './services/gamified-quiz.service';
     HomeworkService,
     TestPaperService,
     GamifiedQuizService,
+    AnswerKeyService,
   ],
   exports: [AiOrchestratorService],
 })

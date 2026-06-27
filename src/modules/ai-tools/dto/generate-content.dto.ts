@@ -2,7 +2,7 @@ import { IsOptional, IsString, IsUUID, MaxLength, IsArray } from 'class-validato
 
 export class GenerateContentDto {
   @IsString()
-  @MaxLength(2000)
+  @MaxLength(10000)
   prompt: string;
 
   @IsOptional()
@@ -40,4 +40,7 @@ export class GenerateContentDto {
 
   @IsOptional()
   testPaperConfig?: any;
+
+  @IsOptional()
+  answerKeyConfig?: any;
 }

@@ -8,6 +8,7 @@ import { WorksheetService } from './services/worksheet.service';
 import { CustomWorksheetService } from './services/custom-worksheet.service';
 import { TestPaperService } from './services/test-paper.service';
 import { GamifiedQuizService } from './services/gamified-quiz.service';
+import { AnswerKeyService } from './services/answer-key.service';
 
 import { AiToolType } from './ai-tool-type';
 
@@ -22,6 +23,7 @@ export class AiOrchestratorService {
     private readonly homework: HomeworkService,
     private readonly testPaper: TestPaperService,
     private readonly gamifiedQuiz: GamifiedQuizService,
+    private readonly answerKey: AnswerKeyService,
   ) {}
 
   async generate(
@@ -62,6 +64,9 @@ export class AiOrchestratorService {
         break;
       case 'gamified-quiz':
         content = await this.gamifiedQuiz.generate(dto, context);
+        break;
+      case 'answer-key':
+        content = await this.answerKey.generate(dto, context);
         break;
       default:
         content = '';

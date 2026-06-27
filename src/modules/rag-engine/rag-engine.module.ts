@@ -22,6 +22,6 @@ import { ChapterDetectionService } from './services/chapter-detection.service';
     VectorSearchService,
     ChapterDetectionService,
   ],
-  exports: [RagEngineService, VectorSearchService, EmbeddingService],
+  exports: [RagEngineService, VectorSearchService, EmbeddingService, PdfExtractionService],
 })
 export class RagEngineModule {}
